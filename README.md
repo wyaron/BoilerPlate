@@ -1,5 +1,4 @@
 
-# BoilerPlate - a template for making your water heater (boiler) smarter...
 
 In Israel the use of **solar** water heating systems is very common. More than 40% of homes use it daily and save lots of money. However, we do have some cold days... Winter in Israel starts in October-November and ends in March. For most Western Europeans, the winter will not look too serious...but still we all miss the sun and there is not enough of it for heating the water for us to shower. Thus we are forced to use an **electric** water heating system. Ask any Israeli about a bad winter day and he will tell you a story about a cold shower since he forgot to turn on the boiler...
 
@@ -13,6 +12,19 @@ Lets start...
 You need to purchase some hardware. Here is the inventory list I've used for my prototype:
   - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
   - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg "Relay Image")
+
+
+## Wiring up the relay
+
+The pi controls the relay. The relay has 4 control pins: GND, VCC, NC, SIG.
+So, we should connect GPIO physical port 4 (VCC) to the realy VCC. Physical port 6 (Ground) to the relay's GND pin.
+And physical port 11 (GPIO 17) to the relay's SIG pin (the relay's NC pin is Not Connected). If you want to use a different GPIO pin
+for controling the relay, simply modify CTL_OUT value in: [relay.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/lib/relay/relay.py).
+
+## Wiring up the relay to the boiler
+
+The relay is simply an electric switch. It has 3 connectors: NC (Normally Close), NO (Normally Open) and COM (Common).
+In order to connect the relay to the boiler we only need to connect the phase wire. Instead of connecting the phase wire to the manual switch (or a mechanical timer switch), connect it to the NO connector. Take the phase wire going out of the manual switch and connect it to the COM connector. Effectively, you have replace the mechanical switch with the relay, hence the relay that is controlled by the pi will determine whether the boiler will get current or not. If requested, I will add some figures for demonstration purposes. 
 
 # Raspberry Pi 2 Setup
 
@@ -58,7 +70,7 @@ Lets start with creating a google project for the controller to use.
 ## Share your calendar with the Google project
 OK, now that we have such a project, grab its email address. Lets assume the email address is: "myboilerservice@appspot.gserviceaccount.com". Go to your gmail calendar web site and click on *settings*. In the Calendar settings page, there are 3 tabs indicated by: "General", "Calendars" and "Labs" as shown in the following  figure:
 
-![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resource/calendar-setup.PNG "Calendar Tab"). 
+![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/calendar-setup.PNG "Calendar Tab"). 
 
 In this page, look for the sharing link under "SHARING":
 
@@ -86,9 +98,53 @@ Under the config directory in our repository, the file [boiler_config.py](https:
 | BOILER_LOG_LEVEL | logging level | logging.DEBUG |
 | BOILER_CONSOLE_LOG_LEVEL | console logging level| logging.DEBUG |
 
-# Controller Operational Overview
-This sections briefly explains how the controller operates. If you feel you can improve it or make the code simpler, feel free to do so. 
+# Executing the boiler controller
 
+Once everything is set up correctly, simply execute the following command:
+
+```sh
+$ echo "start clean (kills previous execution and temp files)"
+$ sudo ./cleanup.sh
+$ echo "run the boiler app"
+$ ./src/boiler.py
+```
+Note that instead of running *boiler.py* you can simply invoke: *boiler_run_forever.py* which makes sure
+to restart the boiler application in case it crashed. If the boiler application is crashed, you will get
+an email with the log files attached so the bug can be traced down and fixed.
+
+Once the application is running, you should see a message that summarized the boiler configurations.
+
+Something like the following:
+
+```sh
+ Boiler Configuration
+ ========================
+ boiler_calendar_tags: [boiler, dud, דוד, בוילר]
+ email_to: ['yaron.boiler@gmail.com']
+ email_subject: Boiler controller event
+ POLL_BOILER_EVENT_MINS: 10
+ POLL_STATISTICS_SECS: 21600
+ MAX_BOILER_TIME_PER_DAY_HOURS: 6
+ log file names: [log/log_boiler.out]
+```
+
+Make sure you don't get any error messages in the console output. The boiler will attempt to read the calendar and is expected
+to send you an email with the above configuration.
+
+# Controller Operational Overview
+This sections briefly explains how the controller operates. If you feel that you can improve it or make the code simpler, feel free to do so.
+
+It is simple. really !
+
+Once the boiler application starts, it attempts to read your calendar. The one that you have specified in CALENDAR_ID. 
+The code attempts to read the next 5 hours events in your calendar (make sure your pi is synchronized or uses NTP). Now,
+the code simply tried to find the next boiler event. A boiler event is one that has an event summary (calendar event subject) that
+is one for the tags appear in: "boiler_calendar_tags". You can configure it to whatever string you like. The last two strings are the hebrew
+translation for "boiler". If no boiler event was found, we will retry in POLL_BOILER_EVENT_MINS minutes. Otherwise. we keep the next boiler event in memory. If the event
+is about to start in less than POLL_BOILER_EVENT_MINS minutes, we will decrease the time we sleep to the deadline. Next, we check if the next boiler event is valid.
+If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancelation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes. It is really important to turn of the boiler upon a crash and report the event.
+
+The rest of the details are in the code. 
 
 
 # Future Work
