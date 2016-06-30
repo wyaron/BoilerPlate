@@ -43,7 +43,7 @@ Lets start with creating a google project for the controller to use.
 7. Enter service ID
 8. Enable "Furnish a new private key" checkbox, choose JSON as the format
 9. Click Create
-10. A JSON file will be downloaded. This file should be placed at the config directory of our source tree. 
+10. A JSON file will be downloaded. This file should be placed at the config directory of our source tree (renamed to "credentials.json")
 11. In the Google API screen, enable the following APIs:
       + Google Calendar API (for reading our calendar)
      + Google Cloud Messaging (for sending push notification to our mobile device)
