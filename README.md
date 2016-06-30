@@ -26,9 +26,11 @@ Next step is to clone the git repository and configure the app so it can access 
 $ echo "clone the git repository"
 $ git clone https://github.com/wyaron/BoilerPlate.git
 $ cd BoilerPlate/src/config
+$ echo "install all required python packages..."
+$ pip install -r requirements.txt
 ```
 
-Once the git repository is cloned, we need to set it up. The boiler application is using Google Calendar API in order to interact with your calendar. In order to do that, we must create a google project with calendar APIs enabled and allow it to read **your** calendar events. Sharing your calendar events is rather simple, in your google calendar settings you can choose to share your calendar with peers by providing their email addresses. 
+Once the git repository is cloned and all required python packages have been installed,  we need to set it up. The boiler application is using Google Calendar API in order to interact with your calendar. In order to do that, we must create a google project with calendar APIs enabled and allow it to read **your** calendar events. Sharing your calendar events is rather simple, in your google calendar settings you can choose to share your calendar with peers by providing their email addresses. 
 The google project we are about to create will have a unique project id email assigned to it. We will share our calendar with this email address thus allowing it to read our calendar. In order to issue a REST request to this project, the client (our boiler controller application) will need a json file that we generate (credentials.json). This file is your *secret* so please do not distribute it. 
 
 ## Create a Google project to access our Calendar
@@ -46,7 +48,7 @@ Lets start with creating a google project for the controller to use.
 10. A JSON file will be downloaded. This file should be placed at the config directory of our source tree (renamed to "credentials.json")
 11. In the Google API screen, enable the following APIs:
       + Google Calendar API (for reading our calendar)
-     + Google Cloud Messaging (for sending push notification to our mobile device)
+      + Google Cloud Messaging (for sending push notification to our mobile device)
 12. Now, we create an API key that will be used to send push notifications to our mobile device. 
 13. In the Google Credentials screen, click on the "Create Credentials" button.
 13. Choose "API Key"
@@ -66,23 +68,26 @@ Once you click on it, you'll see a list of people with whom you would like to sh
 
 ## Configure Controller properties
 
-Under the config directory in our repository, the file "boiler_config.py" holds the rest of the configuration attributes for our controller. This following table provides the attribute and its purpose. You must go over all the properties and make sure they are properly set. 
+Under the config directory in our repository, the file [boiler_config.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/config/boiler_config.py) holds the rest of the configuration attributes for our controller. This following table provides the meaning of each attribute and its default valie. You must go over all the properties and make sure they make sense.
 
-| Attributte        | Purpose                            | Default                      |
-| ----------------- | ---------------------------------- | ---------------------------- |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
-| attr1             |oal 1                            | 100                             |
+| Attributte        | Purpose                            | Default                                              |
+| ----------------- | ---------------------------------- | ---------------------------------------------------- |
+| CALENDAR_ID       | google calendar email (where we schedule the boiler events)  |  NA                        |
+| GMAIL_USER        | gmail user used for sending an email notification            |  NA                        |
+| GMAIL_PASSWORD    | gmail password of the user above                             |  NA                        |
+| EMAIL_TO          | python list of recipients that will get the boiler events    |  NA                        |
+| EMAIL_SUBJECT     | the subject of the email notification from the boiler        |  "Boiler controller event" |
+| PUSH_NOTIFICATION_API_KEY | API key you have generated in step #15 above         |  NA                        |
+| boiler_summary_tags | types of boiler meeting strings used in the calendar       |  ['boiler', 'dud', 'דוד', 'בוילר'] |
+| POLL_BOILER_EVENT_MINS | how often to poll google calendar for boiler events     |  10 min                    |
+| POLL_STATISTICS_SECS | how often to dump boiler activity statistics              |  6 hours                   |
+| MAX_BOILER_TIME_PER_DAY_HOURS | max hours we allow the boiler to be on per day   |  6 hours                   |
+| LOG_FILENAME | log file name | log/log_boiler.out |
+| BOILER_LOG_LEVEL | logging level | logging.DEBUG |
+| BOILER_CONSOLE_LOG_LEVEL | console logging level| logging.DEBUG |
 
 # Controller Operational Overview
 This sections briefly explains how the controller operates. If you feel you can improve it or make the code simpler, feel free to do so. 
-
-
-
 
 
 

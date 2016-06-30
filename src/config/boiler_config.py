@@ -34,7 +34,7 @@ GMAIL_USER = 'XXX@gmail.com'
 GMAIL_PASSWORD = 'XXXXXXXX'
 
 # the list of recipients that will get the boiler events (via the account above)
-EMAIL_TO = ['meir.tsvi@live.com']
+EMAIL_TO = ['xxx.xxx@gmail.com']
 EMAIL_SUBJECT = 'Boiler controller event'
 
 # API key used by GCM (to send notification to the mobile app)
