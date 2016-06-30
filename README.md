@@ -11,8 +11,8 @@ Lets start...
 
 # Hardware 
 You need to purchase some hardware. Here is the inventory list I've used for my prototype:
-  - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
-  - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/relay30A.jpg "Relay Image")
+  - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
+  - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg "Relay Image")
 
 # Raspberry Pi 2 Setup
 
@@ -56,11 +56,11 @@ Lets start with creating a google project for the controller to use.
 ## Share your calendar with the Google project
 OK, now that we have such a project, grab its email address. Lets assume the email address is: "myboilerservice@appspot.gserviceaccount.com". Go to your gmail calendar web site and click on *settings*. In the Calendar settings page, there are 3 tabs indicated by: "General", "Calendars" and "Labs" as shown in the following  figure:
 
-![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/calendar-setup.PNG "Calendar Tab"). 
+![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resource/calendar-setup.PNG "Calendar Tab"). 
 
 In this page, look for the sharing link under "SHARING":
 
-![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/sharing-tab.png "sharing").
+![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/sharing-tab.png "sharing").
 
 Once you click on it, you'll see a list of people with whom you would like to share your calendar. Go ahead and give our project (identified by its emails: "myboilerservice@appspot.gserviceaccount.com") an access to see all event details. 
 
