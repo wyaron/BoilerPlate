@@ -21,10 +21,15 @@ So, we should connect GPIO physical port 4 (VCC) to the realy VCC. Physical port
 And physical port 11 (GPIO 17) to the relay's SIG pin (the relay's NC pin is Not Connected). If you want to use a different GPIO pin
 for controling the relay, simply modify CTL_OUT value in: [relay.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/lib/relay/relay.py).
 
+This is how I have wired up my relay: ![relay wiring](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay-connections.jpg "relay wiring"), and this
+is how my pi is wired: ![pi wiring](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi-connections.jpg "pi wiring")
+
 ## Wiring up the relay to the boiler
 
 The relay is simply an electric switch. It has 3 connectors: NC (Normally Close), NO (Normally Open) and COM (Common).
-In order to connect the relay to the boiler we only need to connect the phase wire. Instead of connecting the phase wire to the manual switch (or a mechanical timer switch), connect it to the NO connector. Take the phase wire going out of the manual switch and connect it to the COM connector. Effectively, you have replace the mechanical switch with the relay, hence the relay that is controlled by the pi will determine whether the boiler will get current or not. If requested, I will add some figures for demonstration purposes. 
+In order to connect the relay to the boiler we only need to connect the phase wire. Instead of connecting the phase wire to the manual switch (or a mechanical timer switch), connect it to the NO connector. Take the phase wire going out of the manual switch and connect it to the COM connector. Effectively, you have replace the mechanical switch with the relay, hence the relay that is controlled by the pi will determine whether the boiler will get current or not.
+
+If requested, I will add some figures for demonstration purposes. 
 
 # Raspberry Pi 2 Setup
 
