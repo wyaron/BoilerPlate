@@ -153,7 +153,7 @@ The rest of the details are in the code.
 
 
 # Future Work
-1. Add an andorid/iOs application
+1. Add an andorid/iOS application
 2. Do we really need an API Key for sending push notifications ? can we use the OAuth2 credentials instead ? 
 3. Add support for an electric valve - some boilers (in rather old apartments) require to close a water valve before turning on the boiler. If we can automate it as part of turning on the boiler it will be great.
 4. Add display to the controller - provide notifications and even maybe a way to manually create events
