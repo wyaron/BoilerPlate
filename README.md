@@ -1,15 +1,17 @@
 # BoilerPlate - a template for making your water heater (boiler) smarter...
 
-In Israel the use of **solar** water heating systems is very common. More than 40% of homes use it daily and save lots of money. However, we do have some cold days... Winter in Israel starts in October-November and ends in March. For most Western Europeans, the winter will not look too serious...but still we all miss the sun and there is not enough of it for heating the water for us to shower. Thus we are forced to use an **electric** water heating system. Ask any Israeli about a bad winter day and he will tell you a story about a cold shower since he forgot to turn on the boiler...
+Israel, as in other countries, the use of **solar** water heating systems is fairly common. More than 40% of Israeli homes use it daily and save money on electricity. However, even in sunny Israel we sometimes have cloudy and cold days in the winter. For most Western Europeans, the Israeli winter will seem rather tame, but there are days when there is not enough sunshine for the solar heating system. On such days Israelis are forced to turn on an **electric** water heating system, or risk a cold shower. Ask Israelis about a bad winter day, and they will tell you a story about a cold shower on a cold day when the electric heater was not turned on. 
 
-Well.. it happens to me too several times and worse than that, it happened to my wife since I forgot to turn it on when she had asked...  I figured, with all the hype around smart homes, it should be very easy to find and purchase a nice looking gadget, with wifi capabilities and a mobile application to control my boiler. Indeed, there are several products that achieve this goal, however, some requires an online service subsription with monthly fees, some are *very* expensive and all of them are closed systems that must be trusted by the users. It is not that I don't trust them, its just that since it messes with my home electricity - I want to be in full control. I want to know *exactly* how it operates and I want to be able to customize it for my specific needs. I want an open sourced controller, one that can be extended and improved by the community. In addition, I don't really need a fancy user interface. I would like to use my good old google calendar to set up the events for turning on/off my boiler. So the idea is to simply set up **boiler** events in my calendar that will be read and executed by the boiler controller application. Some people will argue that a dedicated mobile application is a must. I won't argue, by all means, feel free to add it to the repository. 
+Well, it happens to me too more than once. But worse than that, it happened to my wife!  Of course, it was my fault, since I should have remembered to turn the electric heater on...  I figured, with all the hype around smart homes, it should be easy to find and purchase a nice looking gadget, with wifi capabilities and a mobile application to control my boiler. Indeed, there are several products that achieve this goal, however, some requires an online service subsription with monthly fees, some are *very* expensive, and all of them are closed proprietary systems that require trust by the users. It is not that I do not trust them, it is just that since it messes with my home electricity, I want to be in full control. I want to know *exactly* how it operates and I want to be able to customize it for my specific needs. I want an open sourced controller, one that can be extended and improved by the community. 
 
-Before we start with the details so you can easily replicate the application for your own needs, few words of caution. This is electricity we are playing with. I take no responsibility for the code, for the products that I've used to implement the controller, etc. You need to be sure you undertand what you are doing or consult with a professional in case you really want to use the controller in your home. 
+Furthermore, I do not really need another fancy user interface. I would like to use the good old google calendar to set up events for turning my boiler on or off. So the idea is to simply set up **boiler** events in my calendar to be executed by the the controller. Some people might argue that a dedicated mobile application is a must, in which case just go ahead and add it to the repository. 
 
-Lets start...
+Before we start with the details, a few words of caution. This is electricity we are playing with. I take no responsibility for the code, for the products that I have used to implement the controller, etc. You need to be sure you undertand what you are doing, or consult with a professional, before using the controller in your home. 
+
+Now lets start...
 
 # Hardware 
-You need to purchase some hardware. Here is the inventory list I've used for my prototype:
+You need to purchase some hardware. Here is the inventory list thag I have used for my prototype:
   - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
   - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg "Relay Image")
 
@@ -47,7 +49,7 @@ $ echo "install all required python packages..."
 $ pip install -r requirements.txt
 ```
 
-Once the git repository is cloned and all required python packages have been installed,  we need to set it up. The boiler application is using Google Calendar API in order to interact with your calendar. In order to do that, we must create a google project with calendar APIs enabled and allow it to read **your** calendar events. Sharing your calendar events is rather simple, in your google calendar settings you can choose to share your calendar with peers by providing their email addresses. 
+Once the git repository has been cloned and all required python packages have been installed, we need to set it up. The boiler application is using Google Calendar API in order to interact with your calendar. In order to do that, we must create a google project with calendar APIs enabled and allow it to read **your** calendar events. Sharing your calendar events is rather simple, in your google calendar settings you can choose to share your calendar with peers by providing their email addresses. 
 The google project we are about to create will have a unique project id email assigned to it. We will share our calendar with this email address thus allowing it to read our calendar. In order to issue a REST request to this project, the client (our boiler controller application) will need a json file that we generate (credentials.json). This file is your *secret* so please do not distribute it. 
 
 ## Create a Google project to access our Calendar
@@ -139,24 +141,24 @@ to send you an email with the above configuration.
 # Controller Operational Overview
 This sections briefly explains how the controller operates. If you feel that you can improve it or make the code simpler, feel free to do so.
 
-It is simple. really !
+It is that simple. Really!
 
 Once the boiler application starts, it attempts to read your calendar. The one that you have specified in CALENDAR_ID. 
-The code attempts to read the next 5 hours events in your calendar (make sure your pi is synchronized or uses NTP). Now,
+The code attempts to read your calendar events for the next five hours (make sure your pi is synchronized or uses NTP). Now,
 the code simply tried to find the next boiler event. A boiler event is one that has an event summary (calendar event subject) that
-is one for the tags appear in: "boiler_calendar_tags". You can configure it to whatever string you like. The last two strings are the hebrew
+is one where the tags appear in: "boiler_calendar_tags". You can configure the tags to whatever string you like. The last two strings are the hebrew
 translation for "boiler". If no boiler event was found, we will retry in POLL_BOILER_EVENT_MINS minutes. Otherwise. we keep the next boiler event in memory. If the event
 is about to start in less than POLL_BOILER_EVENT_MINS minutes, we will decrease the time we sleep to the deadline. Next, we check if the next boiler event is valid.
-If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancelation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes. It is really important to turn of the boiler upon a crash and report the event.
+If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancelation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes, for example, the controller upon restarting after a crash, turns off the boiler and reports the event.
 
-The rest of the details are in the code. 
+The rest of the details can be found in the code. 
 
 
 # Future Work
-1. Add an andorid/iOS application
-2. Do we really need an API Key for sending push notifications ? can we use the OAuth2 credentials instead ? 
+1. Add an andorid/iOS application.
+2. Do we really need an API Key for sending push notifications? can we use the OAuth2 credentials instead? 
 3. Add support for an electric valve - some boilers (in rather old apartments) require to close a water valve before turning on the boiler. If we can automate it as part of turning on the boiler it will be great.
-4. Add display to the controller - provide notifications and even maybe a way to manually create events
+4. Add display to the controller - provide notifications and even maybe a way to manually create events.
 more ?
 
 
