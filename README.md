@@ -97,7 +97,7 @@ Under the config directory in our repository, the file [boiler_config.py](https:
 | EMAIL_TO          | python list of recipients that will get the boiler events    |  NA                        |
 | EMAIL_SUBJECT     | the subject of the email notification from the boiler        |  "Boiler controller event" |
 | PUSH_NOTIFICATION_API_KEY | API key you have generated in step #15 above         |  NA                        |
-| boiler_summary_tags | types of boiler meeting strings used in the calendar       |  ['boiler', 'dud', דוד,בו ילר] | 
+| boiler_summary_tags | types of boiler meeting strings used in the calendar       |  ['boiler', 'dud', בוילר, דוד] | 
 | POLL_BOILER_EVENT_MINS | how often to poll google calendar for boiler events     |  10 min                    |
 | POLL_STATISTICS_SECS | how often to dump boiler activity statistics              |  6 hours                   |
 | MAX_BOILER_TIME_PER_DAY_HOURS | max hours we allow the boiler to be on per day   |  6 hours                   |
