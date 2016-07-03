@@ -11,7 +11,7 @@ Before we start with the details, a few words of caution. This is electricity we
 Now lets start...
 
 # Hardware 
-You need to purchase some hardware. Here is the inventory list thag I have used for my prototype:
+You need to purchase some hardware. Here is the inventory list that I have used for my prototype:
   - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
   - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg "Relay Image")
 
