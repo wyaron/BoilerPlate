@@ -2,26 +2,26 @@
 
 In Israel, as in some other countries, the use of **solar** water heating systems is fairly common. More than 40% of Israeli homes use it daily and save money on electricity. However, even in sunny Israel we sometimes have cloudy and cold days in the winter. For most Western Europeans, the Israeli winter will seem rather tame, but there are days when there is not enough sunshine for the solar heating system. On such days Israelis are forced to turn on an **electric** water heating system, or risk a cold shower. Ask Israelis about a bad winter day, and they will tell you a story about a cold shower on a cold day when the electric heater was not turned on. 
 
-Well, it happens to me too more than once. But worse than that, it happened to my wife!  Of course, it was my fault, since I should have remembered to turn the electric heater on...  I figured, with all the hype around smart homes, it should be easy to find and purchase a nice looking gadget, with wifi capabilities and a mobile application to control my boiler. Indeed, there are several products that achieve this goal, however, some requires an online service subscription with monthly fees, some are *very* expensive, and all of them are closed proprietary systems that require trust by the users. It is not that I do not trust them, it is just that since it messes with my home electricity, I want to be in full control. I want to know *exactly* how it operates and I want to be able to customize it for my specific needs. I want an open sourced controller, one that can be extended and improved by the community. 
+Well, it happens to me too more than once. But worse than that, it happened to my wife!  Of course, it was my fault, since I should have remembered to turn the electric heater on...  I figured, with all the hype around smart homes, it should be easy to find and purchase a nice looking gadget, with WiFi capabilities and a mobile application to control my boiler. Indeed, there are several products that achieve this goal, however, some requires an online service subscription with monthly fees, some are *very* expensive, and all of them are closed proprietary systems that require trust by the users. It is not that I do not trust them, it is just that since it messes with my home electricity, I want to be in full control. I want to know *exactly* how it operates and I want to be able to customize it for my specific needs. I want an open sourced controller, one that can be extended and improved by the community. 
 
 Furthermore, I do not really need another fancy user interface. I would like to use the good old google calendar to set up events for turning my boiler on or off. So the idea is to simply set up **boiler** events in my calendar to be executed by the the controller. Some people might argue that a dedicated mobile application is a must, in which case just go ahead and add it to the repository. 
 
-Before we start with the details, a few words of caution. This is electricity we are playing with. I take no responsibility for the code, for the products that I have used to implement the controller, etc. You need to be sure you undertand what you are doing, or consult with a professional, before using the controller in your home. 
+Before we start with the details, a few words of caution. This is electricity we are playing with. I take no responsibility for the code, for the products that I have used to implement the controller, etc. You need to be sure you understand what you are doing, or consult with a professional, before using the controller in your home. 
 
 Now lets start...
 
 # Hardware 
 You need to purchase some hardware. Here is the inventory list that I have used for my prototype:
-  - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similiar price) 
+  - Raspberry Pi 2 Model B - around 35$ ![pi 2](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png "Pi 2 Image") (Note that you can also get the Pi 3 at a similar price) 
   - A 20/30A relay such as: [Seeedstudio ACT05161P Grove SPDT 30A](http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ) ![relay module](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg "Relay Image")
 
 
 ## Wiring up the relay
 
 The pi controls the relay. The relay has 4 control pins: GND, VCC, NC, SIG.
-So, we should connect GPIO physical port 4 (VCC) to the realy VCC. Physical port 6 (Ground) to the relay's GND pin.
+So, we should connect GPIO physical port 4 (VCC) to the relay VCC. Physical port 6 (Ground) to the relay's GND pin.
 And physical port 11 (GPIO 17) to the relay's SIG pin (the relay's NC pin is Not Connected). If you want to use a different GPIO pin
-for controling the relay, simply modify CTL_OUT value in: [relay.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/lib/relay/relay.py).
+for controlling the relay, simply modify CTL_OUT value in: [relay.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/lib/relay/relay.py).
 
 This is how I have wired up my relay: ![relay wiring](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay-connections.jpg "relay wiring"), and this
 is how my pi is wired: ![pi wiring](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi-connections.jpg "pi wiring")
@@ -56,7 +56,7 @@ The google project we are about to create will have a unique project id email as
 Lets start with creating a google project for the controller to use. 
 
 1. Open https://console.developers.google.com/projectselector/permissions/serviceaccounts
-2. Choose "Create a project..." from "Select a project" dropdown.
+2. Choose "Create a project..." from "Select a project" drop-down.
 3. Name you project
 4. Click "Create"
 5. On the new page opened, click on "CREATE SERVICE ACCOUNT"
@@ -87,9 +87,9 @@ Once you click on it, you'll see a list of people with whom you would like to sh
 
 ## Configure Controller properties
 
-Under the config directory in our repository, the file [boiler_config.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/config/boiler_config.py) holds the rest of the configuration attributes for our controller. This following table provides the meaning of each attribute and its default valie. You must go over all the properties and make sure they make sense.
+Under the config directory in our repository, the file [boiler_config.py](https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/config/boiler_config.py) holds the rest of the configuration attributes for our controller. This following table provides the meaning of each attribute and its default value. You must go over all the properties and make sure they make sense.
 
-| Attributte        | Purpose                            | Default                                              |
+| Attribute        | Purpose                            | Default                                              |
 | ----------------- | ---------------------------------- | ---------------------------------------------------- |
 | CALENDAR_ID       | google calendar email (where we schedule the boiler events)  |  NA                        |
 | GMAIL_USER        | gmail user used for sending an email notification            |  NA                        |
@@ -146,16 +146,16 @@ It is that simple. Really!
 Once the boiler application starts, it attempts to read your calendar. The one that you have specified in CALENDAR_ID. 
 The code attempts to read your calendar events for the next five hours (make sure your pi is synchronized or uses NTP). Now,
 the code simply tried to find the next boiler event. A boiler event is one that has an event summary (calendar event subject) that
-is one where the tags appear in: "boiler_calendar_tags". You can configure the tags to whatever string you like. The last two strings are the hebrew
+is one where the tags appear in: "boiler_calendar_tags". You can configure the tags to whatever string you like. The last two strings are the Hebrew
 translation for "boiler". If no boiler event was found, we will retry in POLL_BOILER_EVENT_MINS minutes. Otherwise. we keep the next boiler event in memory. If the event
 is about to start in less than POLL_BOILER_EVENT_MINS minutes, we will decrease the time we sleep to the deadline. Next, we check if the next boiler event is valid.
-If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancelation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes, for example, the controller upon restarting after a crash, turns off the boiler and reports the event.
+If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancellation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes, for example, the controller upon restarting after a crash, turns off the boiler and reports the event.
 
 The rest of the details can be found in the code. 
 
 
 # Future Work
-1. Add an andorid/iOS application.
+1. Add an android/iOS application.
 2. Do we really need an API Key for sending push notifications? can we use the OAuth2 credentials instead? 
 3. Add support for an electric valve - some boilers (in rather old apartments) require to close a water valve before turning on the boiler. If we can automate it as part of turning on the boiler it will be great.
 4. Add display to the controller - provide notifications and even maybe a way to manually create events.
