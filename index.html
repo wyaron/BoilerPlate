@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Boilerplate by wyaron</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Boilerplate</h1>
+        <h2>Making your boiler (דוד) smarter (חכם) shouldn&#39;t be that hard...join in - let&#39;s make it even more smarter :-)</h2>
+        <a href="https://github.com/wyaron/BoilerPlate" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="boilerplate---a-template-for-making-your-water-heater-boiler-smarter" class="anchor" href="#boilerplate---a-template-for-making-your-water-heater-boiler-smarter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>BoilerPlate - a template for making your water heater (boiler) smarter</h1>
+
+<p>In Israel, as in some other countries, the use of <strong>solar</strong> water heating systems is fairly common. More than 40% of Israeli homes use it daily and save money on electricity. However, even in sunny Israel we sometimes have cloudy and cold days in the winter. For most Western Europeans, the Israeli winter will seem rather tame, but there are days when there is not enough sunshine for the solar heating system. On such days Israelis are forced to turn on an <strong>electric</strong> water heating system, or risk a cold shower. Ask Israelis about a bad winter day, and they will tell you a story about a cold shower on a cold day when the electric heater was not turned on. </p>
+
+<p>Well, it happens to me too more than once. But worse than that, it happened to my wife!  Of course, it was my fault, since I should have remembered to turn the electric heater on...  I figured, with all the hype around smart homes, it should be easy to find and purchase a nice looking gadget, with WiFi capabilities and a mobile application to control my boiler. Indeed, there are several products that achieve this goal, however, some requires an online service subscription with monthly fees, some are <em>very</em> expensive, and all of them are closed proprietary systems that require trust by the users. It is not that I do not trust them, it is just that since it messes with my home electricity, I want to be in full control. I want to know <em>exactly</em> how it operates and I want to be able to customize it for my specific needs. I want an open sourced controller, one that can be extended and improved by the community. </p>
+
+<p>Furthermore, I do not really need another fancy user interface. I would like to use the good old google calendar to set up events for turning my boiler on or off. So the idea is to simply set up <strong>boiler</strong> events in my calendar to be executed by the the controller. Some people might argue that a dedicated mobile application is a must, in which case just go ahead and add it to the repository. </p>
+
+<p>Before we start with the details, a few words of caution. This is electricity we are playing with. I take no responsibility for the code, for the products that I have used to implement the controller, etc. You need to be sure you understand what you are doing, or consult with a professional, before using the controller in your home. </p>
+
+<p>Now lets start...</p>
+
+<h1>
+<a id="hardware" class="anchor" href="#hardware" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hardware</h1>
+
+<p>You need to purchase some hardware. Here is the inventory list that I have used for my prototype:</p>
+
+<ul>
+<li>Raspberry Pi 2 Model B - around 35$ <img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi2.png" alt="pi 2" title="Pi 2 Image"> (Note that you can also get the Pi 3 at a similar price) </li>
+<li>A 20/30A relay such as: <a href="http://www.dx.com/p/seeedstudio-act05161p-grove-spdt-30a-single-pole-double-throw-relay-module-blue-green-343494#.V3OdWLt97RZ">Seeedstudio ACT05161P Grove SPDT 30A</a> <img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay30A.jpg" alt="relay module" title="Relay Image">
+</li>
+</ul>
+
+<h2>
+<a id="wiring-up-the-relay" class="anchor" href="#wiring-up-the-relay" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Wiring up the relay</h2>
+
+<p>The pi controls the relay. The relay has 4 control pins: GND, VCC, NC, SIG.
+So, we should connect GPIO physical port 4 (VCC) to the relay VCC. Physical port 6 (Ground) to the relay's GND pin.
+And physical port 11 (GPIO 17) to the relay's SIG pin (the relay's NC pin is Not Connected). If you want to use a different GPIO pin
+for controlling the relay, simply modify CTL_OUT value in: <a href="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/lib/relay/relay.py">relay.py</a>.</p>
+
+<p>This is how I have wired up my relay: <img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/relay-connections.jpg" alt="relay wiring" title="relay wiring">, and this
+is how my pi is wired: <img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/pi-connections.jpg" alt="pi wiring" title="pi wiring"></p>
+
+<h2>
+<a id="wiring-up-the-relay-to-the-boiler" class="anchor" href="#wiring-up-the-relay-to-the-boiler" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Wiring up the relay to the boiler</h2>
+
+<p>The relay is simply an electric switch. It has 3 connectors: NC (Normally Close), NO (Normally Open) and COM (Common).
+In order to connect the relay to the boiler we only need to connect the phase wire. Instead of connecting the phase wire to the manual switch (or a mechanical timer switch), connect it to the NO connector. Take the phase wire going out of the manual switch and connect it to the COM connector. Effectively, you have replace the mechanical switch with the relay, hence the relay that is controlled by the pi will determine whether the boiler will get current or not.</p>
+
+<p>If requested, I will add some figures for demonstration purposes. </p>
+
+<h1>
+<a id="raspberry-pi-2-setup" class="anchor" href="#raspberry-pi-2-setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Raspberry Pi 2 Setup</h1>
+
+<p>You'll need to follow one of the (many) online tutorials on how to install Raspbian on your raspberry pi. Start with <a href="https://www.raspberrypi.org/help/noobs-setup/">noobs</a> or use a ready made image. Once you have Raspbian, make sure you have Python 2.7 installed. </p>
+
+<h1>
+<a id="installation--configuration" class="anchor" href="#installation--configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation &amp; Configuration</h1>
+
+<p>Next step is to clone the git repository and configure the app so it can access your calendar, send event notification (via push notifications and email), service credentials, etc. </p>
+
+<div class="highlight highlight-source-shell"><pre>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>clone the git repository<span class="pl-pds">"</span></span>
+$ git clone https://github.com/wyaron/BoilerPlate.git
+$ <span class="pl-c1">cd</span> BoilerPlate/src/config
+$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>install all required python packages...<span class="pl-pds">"</span></span>
+$ pip install -r requirements.txt</pre></div>
+
+<p>Once the git repository has been cloned and all required python packages have been installed, we need to set it up. The boiler application is using Google Calendar API in order to interact with your calendar. In order to do that, we must create a google project with calendar APIs enabled and allow it to read <strong>your</strong> calendar events. Sharing your calendar events is rather simple, in your google calendar settings you can choose to share your calendar with peers by providing their email addresses. 
+The google project we are about to create will have a unique project id email assigned to it. We will share our calendar with this email address thus allowing it to read our calendar. In order to issue a REST request to this project, the client (our boiler controller application) will need a json file that we generate (credentials.json). This file is your <em>secret</em> so please do not distribute it. </p>
+
+<h2>
+<a id="create-a-google-project-to-access-our-calendar" class="anchor" href="#create-a-google-project-to-access-our-calendar" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Create a Google project to access our Calendar</h2>
+
+<p>Lets start with creating a google project for the controller to use. </p>
+
+<ol>
+<li>Open <a href="https://console.developers.google.com/projectselector/permissions/serviceaccounts">https://console.developers.google.com/projectselector/permissions/serviceaccounts</a>
+</li>
+<li>Choose "Create a project..." from "Select a project" drop-down.</li>
+<li>Name you project</li>
+<li>Click "Create"</li>
+<li>On the new page opened, click on "CREATE SERVICE ACCOUNT"</li>
+<li>Name you service account</li>
+<li>Enter service ID</li>
+<li>Enable "Furnish a new private key" checkbox, choose JSON as the format</li>
+<li>Click Create</li>
+<li>A JSON file will be downloaded. This file should be placed at the config directory of our source tree (renamed to "credentials.json")</li>
+<li>In the Google API screen, enable the following APIs:
+
+<ul>
+<li>Google Calendar API (for reading our calendar)</li>
+<li>Google Cloud Messaging (for sending push notification to our mobile device)</li>
+</ul>
+</li>
+<li>Now, we create an API key that will be used to send push notifications to our mobile device. </li>
+<li>In the Google Credentials screen, click on the "Create Credentials" button.</li>
+<li>Choose "API Key"</li>
+<li>On the new paged opened, click on "Server Key"</li>
+<li>An API key will be generated. </li>
+</ol>
+
+<h2>
+<a id="share-your-calendar-with-the-google-project" class="anchor" href="#share-your-calendar-with-the-google-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Share your calendar with the Google project</h2>
+
+<p>OK, now that we have such a project, grab its email address. Lets assume the email address is: "<a href="mailto:myboilerservice@appspot.gserviceaccount.com">myboilerservice@appspot.gserviceaccount.com</a>". Go to your gmail calendar web site and click on <em>settings</em>. In the Calendar settings page, there are 3 tabs indicated by: "General", "Calendars" and "Labs" as shown in the following  figure:</p>
+
+<p><img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/calendar-setup.PNG" alt="pi 2" title="Calendar Tab">. </p>
+
+<p>In this page, look for the sharing link under "SHARING":</p>
+
+<p><img src="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/resources/sharing-tab.png" alt="pi 2" title="sharing">.</p>
+
+<p>Once you click on it, you'll see a list of people with whom you would like to share your calendar. Go ahead and give our project (identified by its emails: "<a href="mailto:myboilerservice@appspot.gserviceaccount.com">myboilerservice@appspot.gserviceaccount.com</a>") an access to see all event details. </p>
+
+<h2>
+<a id="configure-controller-properties" class="anchor" href="#configure-controller-properties" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configure Controller properties</h2>
+
+<p>Under the config directory in our repository, the file <a href="https://raw.githubusercontent.com/wyaron/BoilerPlate/master/src/config/boiler_config.py">boiler_config.py</a> holds the rest of the configuration attributes for our controller. This following table provides the meaning of each attribute and its default value. You must go over all the properties and make sure they make sense.</p>
+
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Purpose</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CALENDAR_ID</td>
+<td>google calendar email (where we schedule the boiler events)</td>
+<td>NA</td>
+</tr>
+<tr>
+<td>GMAIL_USER</td>
+<td>gmail user used for sending an email notification</td>
+<td>NA</td>
+</tr>
+<tr>
+<td>GMAIL_PASSWORD</td>
+<td>gmail password of the user above</td>
+<td>NA</td>
+</tr>
+<tr>
+<td>EMAIL_TO</td>
+<td>python list of recipients that will get the boiler events</td>
+<td>NA</td>
+</tr>
+<tr>
+<td>EMAIL_SUBJECT</td>
+<td>the subject of the email notification from the boiler</td>
+<td>"Boiler controller event"</td>
+</tr>
+<tr>
+<td>PUSH_NOTIFICATION_API_KEY</td>
+<td>API key you have generated in step #15 above</td>
+<td>NA</td>
+</tr>
+<tr>
+<td>boiler_summary_tags</td>
+<td>types of boiler meeting strings used in the calendar</td>
+<td>[boiler, dud, דוד, בוילר]</td>
+</tr>
+<tr>
+<td>POLL_BOILER_EVENT_MINS</td>
+<td>how often to poll google calendar for boiler events</td>
+<td>10 min</td>
+</tr>
+<tr>
+<td>POLL_STATISTICS_SECS</td>
+<td>how often to dump boiler activity statistics</td>
+<td>6 hours</td>
+</tr>
+<tr>
+<td>MAX_BOILER_TIME_PER_DAY_HOURS</td>
+<td>max hours we allow the boiler to be on per day</td>
+<td>6 hours</td>
+</tr>
+<tr>
+<td>LOG_FILENAME</td>
+<td>log file name</td>
+<td>log/log_boiler.out</td>
+</tr>
+<tr>
+<td>BOILER_LOG_LEVEL</td>
+<td>logging level</td>
+<td>logging.DEBUG</td>
+</tr>
+<tr>
+<td>BOILER_CONSOLE_LOG_LEVEL</td>
+<td>console logging level</td>
+<td>logging.DEBUG</td>
+</tr>
+</tbody>
+</table>
+
+<h1>
+<a id="executing-the-boiler-controller" class="anchor" href="#executing-the-boiler-controller" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Executing the boiler controller</h1>
+
+<p>Once everything is set up correctly, simply execute the following command:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>start clean (kills previous execution and temp files)<span class="pl-pds">"</span></span>
+$ sudo ./cleanup.sh
+$ <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>run the boiler app<span class="pl-pds">"</span></span>
+$ ./src/boiler.py</pre></div>
+
+<p>Note that instead of running <em>boiler.py</em> you can simply invoke: <em>boiler_run_forever.py</em> which makes sure
+to restart the boiler application in case it crashed. If the boiler application is crashed, you will get
+an email with the log files attached so the bug can be traced down and fixed.</p>
+
+<p>Once the application is running, you should see a message that summarized the boiler configurations.</p>
+
+<p>Something like the following:</p>
+
+<div class="highlight highlight-source-shell"><pre> Boiler Configuration
+ ========================
+ boiler_calendar_tags: [boiler, dud, דוד, בוילר]
+ email_to: [<span class="pl-s"><span class="pl-pds">'</span>yaron.boiler@gmail.com<span class="pl-pds">'</span></span>]
+ email_subject: Boiler controller event
+ POLL_BOILER_EVENT_MINS: 10
+ POLL_STATISTICS_SECS: 21600
+ MAX_BOILER_TIME_PER_DAY_HOURS: 6
+ log file names: [log/log_boiler.out]</pre></div>
+
+<p>Make sure you don't get any error messages in the console output. The boiler will attempt to read the calendar and is expected
+to send you an email with the above configuration.</p>
+
+<h1>
+<a id="controller-operational-overview" class="anchor" href="#controller-operational-overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Controller Operational Overview</h1>
+
+<p>This sections briefly explains how the controller operates. If you feel that you can improve it or make the code simpler, feel free to do so.</p>
+
+<p>It is that simple. Really!</p>
+
+<p>Once the boiler application starts, it attempts to read your calendar. The one that you have specified in CALENDAR_ID. 
+The code attempts to read your calendar events for the next five hours (make sure your pi is synchronized or uses NTP). Now,
+the code simply tried to find the next boiler event. A boiler event is one that has an event summary (calendar event subject) that
+is one where the tags appear in: "boiler_calendar_tags". You can configure the tags to whatever string you like. The last two strings are the Hebrew
+translation for "boiler". If no boiler event was found, we will retry in POLL_BOILER_EVENT_MINS minutes. Otherwise. we keep the next boiler event in memory. If the event
+is about to start in less than POLL_BOILER_EVENT_MINS minutes, we will decrease the time we sleep to the deadline. Next, we check if the next boiler event is valid.
+If we have one, we check if we need to turn on the boiler (due time). If it is not the time, we wait again. This mechanism is very simple and allows us to respond to event cancellation very quickly. It also allow us to be operational if there is temporary connectivity issue. If we have a boiler event in memory, we will act accordingly. The code also makes sure to properly handle various crashes, for example, the controller upon restarting after a crash, turns off the boiler and reports the event.</p>
+
+<p>The rest of the details can be found in the code. </p>
+
+<h1>
+<a id="future-work" class="anchor" href="#future-work" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Future Work</h1>
+
+<ol>
+<li>Add an android/iOS application.</li>
+<li>Do we really need an API Key for sending push notifications? can we use the OAuth2 credentials instead? </li>
+<li>Add support for an electric valve - some boilers (in rather old apartments) require to close a water valve before turning on the boiler. If we can automate it as part of turning on the boiler it will be great.</li>
+<li>Add display to the controller - provide notifications and even maybe a way to manually create events.
+more ?</li>
+</ol>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/wyaron/BoilerPlate/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/wyaron/BoilerPlate/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/wyaron/BoilerPlate"></a> is maintained by <a href="https://github.com/wyaron">wyaron</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
