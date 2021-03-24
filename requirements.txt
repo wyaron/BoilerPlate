@@ -30,7 +30,7 @@ python-gcm==0.4
 python-utils==1.6.2
 pytz==2016.4
 requests==2.4.3
-rsa==3.4
+rsa==4.1
 sense-hat==2.1.0
 simplejson==3.8.2
 six==1.10.0
