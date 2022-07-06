@@ -8,7 +8,7 @@ colorama==0.3.2
 gdata==2.0.18
 google-api-python-client==1.5.0
 gpiozero==1.1.0
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.9.2
 lxkeymap==0.1
 mcpi==0.1.1
